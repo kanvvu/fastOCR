@@ -34,7 +34,7 @@ class ScreenCaptureApp:
         self.start_y = None
         self.hidden = False 
 
-        self.state = 0
+        self.state = 4
 
         self.bind_events()
         print(f"{master.winfo_screenwidth()}, {master.winfo_screenheight()}")
@@ -126,15 +126,35 @@ class ScreenCaptureApp:
         self.hide_app()
 
     def capture_screen(self, x1, y1, x2, y2):
+        
+        if x1 <= x2:
+            if y1 > y2:
+                temp_y1 = y1
+                y1 = y2
+                y2 = temp_y1 
+        else:
+            if y1 > y2:
+                temp_x1 = x1
+                temp_y1 = y1
+                x1 = x2
+                y1 = y2
+                x2 = temp_x1
+                y2 = temp_y1
+            else:
+                temp_x1 = x1
+                x1 = x2
+                x2 = temp_x1 
+
+        
         try:
             screenshot = ImageGrab.grab(bbox=(x1*self.screen_scale, y1*self.screen_scale, x2*self.screen_scale, y2*self.screen_scale))
             screenshot.save("screenshot.png")
-            print("Screenshot saved as screenshot.png")
+            print(f"Screenshot saved")
             ocr_text = pytesseract.image_to_string(screenshot, lang=self.languages[self.state])
             print(ocr_text)
             copy_to_clipboard(ocr_text)
-        except:
-            print("imageGrab error")
+        except Exception as e:
+            messagebox.showerror("fastOCR ERROR", f"ERROR: {e}")
 
 
 if __name__ == "__main__":
