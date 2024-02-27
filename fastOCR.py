@@ -7,6 +7,7 @@ import keyboard
 from threading import Thread
 import pystray
 from json_config import check_and_return_config
+import os
 
 def copy_to_clipboard(text):
     pyperclip.copy(text)
@@ -34,7 +35,17 @@ class ScreenCaptureApp:
         self.start_y = None
         self.hidden = False 
 
-        self.state = 4
+        last_state = 0
+        last_state_file = open("save.bin", "r")
+        try:
+            last_state = int(last_state_file.readline())
+        except:
+            messagebox.showerror("fastOCR ERROR", f"Couldn't read last selected languague from save.bin file")
+        last_state_file.close()
+
+        self.state = last_state 
+        if self.state > len(languages):
+            self.state = 0
 
         self.bind_events()
         print(f"{master.winfo_screenwidth()}, {master.winfo_screenheight()}")
@@ -73,6 +84,8 @@ class ScreenCaptureApp:
     def check_destroy_window(self):
         if self.app_quited.get():
             self.master.destroy() 
+            with open("save.bin", "w") as last_state_file:
+                last_state_file.write(f"{self.state}")
         else:
             self.master.after(100, self.check_destroy_window)
 
