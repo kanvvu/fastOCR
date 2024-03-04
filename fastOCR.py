@@ -49,6 +49,8 @@ class ScreenCaptureApp:
 
         self.bind_events()
         print(f"{master.winfo_screenwidth()}, {master.winfo_screenheight()}")
+        
+        self.hide_app()
     
 
     def set_state(self, v):
